@@ -1,14 +1,12 @@
 package controller;
 
 import java.awt.AlphaComposite;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -28,17 +26,15 @@ import model.Rook;
 import model.Type;
 import view.Board;
 
-public class GamePanel extends JPanel implements Runnable {
+public class GamePanel extends JPanel {
 	public static final int WIDTH = 780;
 	public static final int HEIGHT = 600;
-	final int FPS = 60;
-	Thread gameThread;
 	Board board = new Board();
 	Mouse mouse = new Mouse();
-	
-	//Button
+
+	// Button
 	JButton surrender = new JButton("Đầu hàng");
- 
+
 	// PIECES
 	public static ArrayList<Piece> pieces = new ArrayList<>();
 	public static ArrayList<Piece> simPieces = new ArrayList<>();
@@ -60,20 +56,20 @@ public class GamePanel extends JPanel implements Runnable {
 		setLayout(null);
 		add(surrender);
 		surrender.setBounds(610, 550, 100, 30);
-		
+
 		init();
-		
+
 		addMouseListener(mouse);
 		addMouseMotionListener(mouse);
 
 		setPieces();
 		copyPieces(pieces, simPieces);
-		
+
 	}
 
 	private void init() {
 		surrender.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
@@ -82,8 +78,8 @@ public class GamePanel extends JPanel implements Runnable {
 			}
 		});
 	}
-	
-	private void update() {
+
+	public void update() {
 		if (gameover == false) {
 			/// MOUSE BUTTON CLICK ///
 			if (mouse.clicked) {
@@ -122,6 +118,7 @@ public class GamePanel extends JPanel implements Runnable {
 				simulate();
 			}
 		}
+		repaint();
 	}
 
 	private void simulate() {
@@ -254,37 +251,7 @@ public class GamePanel extends JPanel implements Runnable {
 						}
 					}
 				}
-			}
-			// Kiểm tra hướng tấn công từ quân pháo
-			else if (!mouse.clicked) {
-				int directionCol = Integer.compare(checkingP.col, king.col);
-				int directionRow = Integer.compare(checkingP.row, king.row);
-				int col = king.col + directionCol;
-				int row = king.row + directionRow;
-				boolean hasBarrier = false;
-
-				while (col != checkingP.col || row != checkingP.row) {
-					if (checkingP.getHittingP(col, row) != null) {
-						if (hasBarrier) {
-							// Có nhiều hơn một quân cản
-							return false;
-						}
-						hasBarrier = true;
-					}
-					col += directionCol;
-					row += directionRow;
-				}
-				Piece checkTargetPiece = checkingP.getHittingP(checkingP.col, checkingP.row);
-				// Kiểm tra xem ô ở vị trí xét có quân cờ nào không
-				if (checkTargetPiece != null) {
-					if (checkingP.type != Type.CANNON && checkingP.color == currentColor && !hasBarrier) {
-						return false;
-					}
-				}
-			} 
-		else {
-				// Kiểm tra lộ mặt của tướng
-				// Kiểm tra hướng tấn công từ quân mã
+			} else {
 			}
 		}
 		return true;
@@ -327,11 +294,6 @@ public class GamePanel extends JPanel implements Runnable {
 		copyPieces(pieces, simPieces);
 
 		return isValidMove;
-	}
-
-	public void launchGame() {
-		gameThread = new Thread(this);
-		gameThread.start();
 	}
 
 	public void setPieces() {
@@ -380,29 +342,6 @@ public class GamePanel extends JPanel implements Runnable {
 		}
 	}
 
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-
-		// GAME LOOP
-		double drawInterval = 1000000000 / FPS;
-		double delta = 0;
-		long lastTime = System.nanoTime();
-		long currentTime;
-
-		while (gameThread != null) {
-			currentTime = System.nanoTime();
-			delta += (currentTime - lastTime) / drawInterval;
-			lastTime = currentTime;
-
-			if (delta >= 1) {
-				update();
-				repaint();
-				delta--;
-			}
-		}
-	}
-
 	private void changePlayer() {
 		if (currentColor == RED) {
 			currentColor = BLACK;
@@ -417,12 +356,12 @@ public class GamePanel extends JPanel implements Runnable {
 		Graphics2D g2 = (Graphics2D) g;
 		// BOARD
 		board.draw(g2);
-		
+
 		// PIECES
 		for (Piece p : simPieces) {
 			p.draw(g2);
 		}
-		
+
 		if (activeP != null) {
 			if (canMove) {
 				if (isIllegal(activeP) || opponentCanCaptureKing()) {

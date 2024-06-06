@@ -1,20 +1,18 @@
 package view;
 
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-import controller.GamePanel;
 
 public class StartingScreen extends JFrame {
 
-	JFrame startFrame = new JFrame();
 	JButton withMachine,twoPlayer, guide;
 	
 	public StartingScreen() {
+		JFrame startFrame = new JFrame();
 		startFrame.setTitle("GAME CỜ TƯỚNG");
 		
 		withMachine = new JButton();
