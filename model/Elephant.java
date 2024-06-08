@@ -12,15 +12,18 @@ public class Elephant extends Piece{
 		}else {
 			image = getImage("/piece/b_ELEPHANT");
 		}
+		
+		bl = new IsWithinHalfBoard();
+		
 	}
-	@Override
-	public boolean isWithinBoard(int targetCol, int targetRow) {
-		if (targetCol >= 0 && targetCol <= 8 && targetRow >= 0 && targetRow <= 4 || 
-				targetCol >= 0 && targetCol <= 8 && targetRow >= 5 && targetRow <= 9) {
-			return true;
-		}
-		return false;
-	}
+//	@Override
+//	public boolean isWithinBoard(int targetCol, int targetRow) {
+//		if (targetCol >= 0 && targetCol <= 8 && targetRow >= 0 && targetRow <= 4 || 
+//				targetCol >= 0 && targetCol <= 8 && targetRow >= 5 && targetRow <= 9) {
+//			return true;
+//		}
+//		return false;
+//	}
 	public boolean canMove(int targetCol, int targetRow) {
 		if(isWithinBoard(targetCol, targetRow) && isSameSquare(targetCol, targetRow) == false) {
 			if(Math.abs(targetCol - preCol) == 2 && Math.abs(targetRow - preRow) == 2) {

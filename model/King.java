@@ -13,15 +13,18 @@ public class King extends Piece {
 		} else {
 			image = getImage("/piece/b_KING");
 		}
+		
+		bl = new IsWithinPalace();
+		
 	}
-
-	public boolean isWithinBoard(int targetCol, int targetRow) {
-		if (targetCol >= 3 && targetCol <= 5 && targetRow >= 7 && targetRow <= 9 || 
-				targetCol >= 3 && targetCol <= 5 && targetRow >= 0 && targetRow <= 2) {
-			return true;
-		}
-		return false;
-	}
+	
+//	public boolean isWithinBoard(int targetCol, int targetRow) {
+//		if (targetCol >= 3 && targetCol <= 5 && targetRow >= 7 && targetRow <= 9 || 
+//				targetCol >= 3 && targetCol <= 5 && targetRow >= 0 && targetRow <= 2) {
+//			return true;
+//		}
+//		return false;
+//	}
 
 	public boolean canMove(int targetCol, int targetRow) {
 		if (isWithinBoard(targetCol, targetRow)) {

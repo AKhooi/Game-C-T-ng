@@ -10,6 +10,7 @@ import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -25,20 +26,28 @@ import model.Piece;
 import model.Rook;
 import model.Type;
 import view.Board;
+import view.GameFrame;
+import view.Observer;
+import view.StartingView;
 
 public class GamePanel extends JPanel {
 	public static final int WIDTH = 780;
 	public static final int HEIGHT = 600;
 	Board board = new Board();
 	Mouse mouse = new Mouse();
+	GameFrame gs;
+	GameState state;
 
 	// Button
 	JButton surrender = new JButton("Đầu hàng");
+	JButton quit = new JButton("Thoát");
 
 	// PIECES
 	public static ArrayList<Piece> pieces = new ArrayList<>();
 	public static ArrayList<Piece> simPieces = new ArrayList<>();
 	protected Piece activeP, checkingP;
+
+	private List<Observer> observers = new ArrayList<>();
 
 	// COLOR
 	public static final int RED = 0;
@@ -50,12 +59,16 @@ public class GamePanel extends JPanel {
 	boolean validSquare;
 	boolean gameover;
 
-	public GamePanel() {
+	public GamePanel(GameFrame gs) {
+		this.gs = gs;
+		this.state = new WaitingState();
 		setPreferredSize(new Dimension(WIDTH, HEIGHT));
 		setBackground(Color.BLACK);
 		setLayout(null);
 		add(surrender);
-		surrender.setBounds(610, 550, 100, 30);
+		add(quit);
+		surrender.setBounds(560, 550, 90, 30);
+		quit.setBounds(670, 550, 90, 30);
 
 		init();
 
@@ -74,9 +87,28 @@ public class GamePanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				gameover = true;
+				surrender.setEnabled(false);
 				changePlayer();
+				notifyObservers();
 			}
 		});
+		quit.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				gs.dispose();
+				new StartingView();
+			}
+		});
+	}
+
+	public void setState(GameState state) {
+		this.state = state;
+	}
+
+	public void play() {
+		state.handle();
 	}
 
 	public void update() {
@@ -117,6 +149,7 @@ public class GamePanel extends JPanel {
 			if (activeP != null) {
 				simulate();
 			}
+//			notifyObservers();
 		}
 		repaint();
 	}
@@ -342,13 +375,35 @@ public class GamePanel extends JPanel {
 		}
 	}
 
-	private void changePlayer() {
+	public void changePlayer() {
 		if (currentColor == RED) {
 			currentColor = BLACK;
 		} else {
 			currentColor = RED;
 		}
 		activeP = null;
+	}
+
+	public boolean isGameOver() {
+		return gameover;
+	}
+
+	public int getCurrentColor() {
+		return currentColor;
+	}
+
+	public void addObserver(Observer observer) {
+		observers.add(observer);
+	}
+
+	public void removeObserver(Observer observer) {
+		observers.remove(observer);
+	}
+
+	public void notifyObservers() {
+		for (Observer observer : observers) {
+			observer.update();
+		}
 	}
 
 	public void paintComponent(Graphics g) {
@@ -386,31 +441,38 @@ public class GamePanel extends JPanel {
 		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g2.setFont(new Font("Time New Roman", Font.PLAIN, 20));
 		g2.setColor(Color.white);
-
-		if (currentColor == RED) {
-			g2.drawString("Đến lượt quân đỏ", 580, 400);
-			if (checkingP != null && checkingP.color == BLACK) {
-				g2.setColor(Color.red);
-				g2.drawString("Tướng đang bị chiếu!", 580, 450);
-			}
-		} else {
-			g2.drawString("Đến lượt quân đen", 580, 200);
-			if (checkingP != null && checkingP.color == RED) {
-				g2.setColor(Color.red);
-				g2.drawString("Tướng đang bị chiếu!", 580, 250);
-			}
-		}
-
-		if (gameover) {
-			String s = "";
+		if (gameover == false) {
 			if (currentColor == RED) {
-				s = "Đội đỏ đã chiến thắng";
+				play();
+				g2.drawString("Đến lượt quân đỏ", 580, 400);
+				if (checkingP != null && checkingP.color == BLACK) {
+					setState(new KingInCheckState());
+					play(); // In ra trạng thái "Tướng đang bị chiếu!"
+					g2.setColor(Color.red);
+					g2.drawString("Tướng đang bị chiếu!", 580, 450);
+				}
 			} else {
-				s = "Đội đen đã chiến thắng";
+				play();
+				g2.drawString("Đến lượt quân đen", 580, 200);
+				if (checkingP != null && checkingP.color == RED) {
+					setState(new KingInCheckState());
+					play(); // In ra trạng thái "Tướng đang bị chiếu!"
+					g2.setColor(Color.red);
+					g2.drawString("Tướng đang bị chiếu!", 580, 250);
+				}
 			}
-			g2.setFont(new Font("UTM HelvetIns", Font.PLAIN, 40));
-			g2.setColor(Color.green);
-			g2.drawString(s, 90, 320);
-		}
+		} else
+			setState(new EndGameState());
+			play(); // In ra trạng thái "Trò chơi đã kết thúc."
+//			String s = "";
+//			if (currentColor == RED) {
+//				s = "Đội đỏ đã chiến thắng";
+//			} else {
+//				s = "Đội đen đã chiến thắng";
+//			}
+//			g2.setFont(new Font("UTM HelvetIns", Font.PLAIN, 40));
+//			g2.setColor(Color.green);
+//			g2.drawString(s, 90, 320);
+
 	}
 }

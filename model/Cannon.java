@@ -12,6 +12,9 @@ public class Cannon extends Piece {
 		} else {
 			image = getImage("/piece/b_CANNON");
 		}
+		
+		bl = new IsWithinBoard();
+		
 	}
 
 	public boolean canMove(int targetCol, int targetRow) {

@@ -12,6 +12,9 @@ public class Pawn extends Piece {
 		} else {
 			image = getImage("/piece/b_PAWN");
 		}
+		
+		bl = new IsWithinBoard();
+		
 	}
 
 	public boolean canMove(int targetCol, int targetRow) {

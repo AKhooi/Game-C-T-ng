@@ -23,6 +23,7 @@ public abstract class Piece {
 	public Piece hittingP;
 	public int countMoved = 0;
 	
+	BoardLimit bl;
 
 	public Piece(int color, int col, int row) {
 		this.color = color;
@@ -72,6 +73,14 @@ public abstract class Piece {
 		return 0;
 	}
 
+	public BoardLimit setBoardLimit(BoardLimit bl) {
+		return this.bl = bl;
+	}
+	
+	public boolean isWithinBoard(int targetCol, int targetRow) {
+		return bl.checkBoardLimit(targetCol, targetRow);
+	}
+	
 	public void updatePosition() {
 		x = getX(col);
 		y = getY(row);
@@ -91,12 +100,6 @@ public abstract class Piece {
 		return false;
 	}
 
-	public boolean isWithinBoard(int targetCol, int targetRow) {
-		if (targetCol >= 0 && targetCol <= 8 && targetRow >= 0 && targetRow <= 9) {
-			return true;
-		}
-		return false;
-	}
 	//Kiểm tra ô đích có giống ô đang đứng không
 	public boolean isSameSquare(int targetCol, int targetRow) {
 		if (targetCol == preCol && targetRow == preRow) {

@@ -12,6 +12,9 @@ public class Rook extends Piece {
 		} else {
 			image = getImage("/piece/b_ROOK");
 		}
+		
+		bl = new IsWithinBoard();
+		
 	}
 
 	public boolean canMove(int targetCol, int targetRow) {

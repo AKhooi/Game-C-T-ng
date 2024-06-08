@@ -13,6 +13,8 @@ public class Knight extends Piece {
 		} else {
 			image = getImage("/piece/b_KNIGHT");
 		}
+		
+		bl = new IsWithinBoard();
 	}
 
 	public boolean canMove(int targetCol, int targetRow) {
